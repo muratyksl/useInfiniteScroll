@@ -1,4 +1,3 @@
-/* eslint-disable no-undef */
 module.exports = {
   env: {
     browser: true,
@@ -8,6 +7,7 @@ module.exports = {
     "eslint:recommended",
     "plugin:react/recommended",
     "plugin:@typescript-eslint/recommended",
+    "prettier",
   ],
   parser: "@typescript-eslint/parser",
   parserOptions: {

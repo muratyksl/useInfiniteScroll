@@ -5,9 +5,18 @@ type RequestedType<T> = {
   totalPages: number;
 };
 
+export type ReturnType<T> = {
+  data: T[];
+  isLoading: boolean;
+  setLastElement: React.Dispatch<React.SetStateAction<HTMLElement | null>>;
+  totalPages: number;
+  page: number;
+  resetPage: () => void;
+};
+
 function useEasyInfiniteScroll<T>(
   requestedData: (pageNumber: number) => Promise<RequestedType<T>>
-) {
+): ReturnType<T> {
   const [data, setData] = useState<T[]>([]);
   const [totalPages, setTotalPages] = useState(0);
   const [isLoading, setIsLoading] = useState(false);

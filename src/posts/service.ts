@@ -5,7 +5,7 @@ export async function getPosts(
   limit = 5
 ): Promise<RequestedPosts> {
   const posts = await fetch(
-    `https://jsonplaceholder.typicode.com/posts?_page=${page}&_limit=${limit}`
+    `https://jsonplaceholder.typicode.com/posts?page=${page}&limit=${limit}`
   );
 
   const data = await posts.json();

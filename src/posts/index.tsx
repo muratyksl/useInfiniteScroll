@@ -1,17 +1,22 @@
-import React, { useEffect } from "react";
+import React from "react";
 
-import useEasyInfiniteScroll from "../helperHooks/useEasyInfiniteScroll";
+import useEasyInfiniteScroll, {
+  ReturnType,
+} from "../helperHooks/useEasyInfiniteScroll";
 import Post from "./Post";
 import { getPosts } from "./service";
 import { Post as PostType } from "./types";
 import Spinner from "../components/Spinner";
 
-function Posts() {
-  let { data, isLoading, setLastElement, totalPages, page, resetPage } =
-    useEasyInfiniteScroll<PostType>(getPosts);
-
+function Posts({
+  data,
+  isLoading,
+  setLastElement,
+  totalPages,
+  page,
+}: ReturnType<PostType>) {
   return (
-    <div className="min-h-96 h-3/4 p-6 bg-slate-200 rounded-lg drop-shadow-lg overflow-auto">
+    <>
       {data.map((post, i) => {
         return i === data.length - 1 && page < totalPages ? (
           <Post
@@ -25,8 +30,30 @@ function Posts() {
         );
       })}
       {isLoading ? <Spinner /> : null}
+    </>
+  );
+}
+
+function Container() {
+  const { data, isLoading, setLastElement, totalPages, page, resetPage } =
+    useEasyInfiniteScroll<PostType>(getPosts);
+
+  return (
+    <div className="min-h-96 h-3/4 p-6 bg-slate-200 rounded-lg drop-shadow-lg overflow-auto">
+      {data.length === 0 && !isLoading ? (
+        "No posts found"
+      ) : (
+        <Posts
+          data={data}
+          isLoading={isLoading}
+          setLastElement={setLastElement}
+          totalPages={totalPages}
+          page={page}
+          resetPage={resetPage}
+        />
+      )}
     </div>
   );
 }
 
-export default Posts;
+export default Container;

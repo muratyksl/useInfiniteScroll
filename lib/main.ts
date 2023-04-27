@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 
-type RequestedType<T> = {
+export type RequestedType<T> = {
   data: T[];
   totalPages: number;
 };
@@ -14,7 +14,7 @@ export type ReturnType<T> = {
   resetPage: () => void;
 };
 
-function useEasyInfiniteScroll<T>(
+function useInfiniteScroll<T>(
   requestedData: (pageNumber: number) => Promise<RequestedType<T>>
 ): ReturnType<T> {
   const [data, setData] = useState<T[]>([]);
@@ -80,4 +80,4 @@ function useEasyInfiniteScroll<T>(
   };
 }
 
-export default useEasyInfiniteScroll;
+export default useInfiniteScroll;

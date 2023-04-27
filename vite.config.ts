@@ -17,9 +17,9 @@ export default defineConfig({
     lib: {
       // Could also be a dictionary or array of multiple entry points
       entry: resolve(__dirname, "lib/main.ts"),
-      name: "use-infinite-scroll",
+      name: "useInfiniteScroll",
       // the proper extensions will be added
-      fileName: "use-infinite-scroll",
+      fileName: "useInfiniteScroll",
     },
     rollupOptions: {
       // make sure to externalize deps that shouldn't be bundled

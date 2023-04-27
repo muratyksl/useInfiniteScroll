@@ -1,17 +1,17 @@
 {
-  "name": "use-infinite-scroll",
+  "name": "useInfiniteScroll",
   "version": "0.0.0",
   "type": "module",
   "files": [
     "dist"
   ],
-  "main": "./dist/use-infinite-scroll.umd.cjs",
-  "module": "./dist/use-infinite-scroll.js",
+  "main": "./dist/useInfiniteScroll.umd.cjs",
+  "module": "./dist/useInfiniteScroll.js",
   "types": "./dist/main.d.ts",
   "exports": {
     ".": {
-      "import": "./dist/use-infinite-scroll.js",
-      "require": "./dist/use-infinite-scroll.umd.cjs"
+      "import": "./dist/useInfiniteScroll.js",
+      "require": "./dist/useInfiniteScroll.umd.cjs"
     }
   },
   "scripts": {

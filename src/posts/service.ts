@@ -1,11 +1,11 @@
-import { Post, RequestedPosts } from "./types";
+import type { RequestedPosts } from "./types";
 
 export async function getPosts(
   page: number,
-  limit = 5
+  limit = 5,
 ): Promise<RequestedPosts> {
   const posts = await fetch(
-    `https://jsonplaceholder.typicode.com/posts?page=${page}&limit=${limit}`
+    `https://jsonplaceholder.typicode.com/posts?page=${page}&limit=${limit}`,
   );
 
   const data = await posts.json();

@@ -15,7 +15,7 @@ export type ReturnType<T> = {
 };
 
 function useInfiniteScroll<T>(
-  requestedData: (pageNumber: number) => Promise<RequestedType<T>>
+  requestedData: (pageNumber: number) => Promise<RequestedType<T>>,
 ): ReturnType<T> {
   const [data, setData] = useState<T[]>([]);
   const [totalPages, setTotalPages] = useState(0);
@@ -28,7 +28,7 @@ function useInfiniteScroll<T>(
       if (entries[0].isIntersecting) {
         setPage((prev) => prev + 1);
       }
-    })
+    }),
   );
 
   const getData = useCallback(async () => {
@@ -46,7 +46,7 @@ function useInfiniteScroll<T>(
     } finally {
       setIsLoading(false);
     }
-  }, [page]);
+  }, [page, requestedData]);
 
   useEffect(() => {
     const currentElement = lastElement;
@@ -63,8 +63,9 @@ function useInfiniteScroll<T>(
   }, [lastElement]);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- getData() fetches asynchronously; it is restructured in the next commit
     getData();
-  }, [page]);
+  }, [getData]);
 
   const resetPage = () => {
     setPage(1);

@@ -1,29 +1,19 @@
-/// <reference types="vitest" />
-/// <reference types="vite/client" />
-
 import react from "@vitejs/plugin-react";
-import { defineConfig } from "vite";
-import { resolve } from "path";
-import dts from "vite-plugin-dts";
+import { defineConfig } from "vitest/config";
 
 export default defineConfig({
-  plugins: [react(), dts({ tsConfigFilePath: "tsconfig.lib.json" })],
-  test: {
-    globals: true,
-    environment: "jsdom",
-    setupFiles: ["./src/setup.ts"],
-  },
+  plugins: [react()],
   build: {
+    copyPublicDir: false,
+    sourcemap: true,
     lib: {
-      // Could also be a dictionary or array of multiple entry points
-      entry: resolve(__dirname, "lib/main.ts"),
+      entry: "lib/index.ts",
       name: "useInfiniteScroll",
-      // the proper extensions will be added
-      fileName: "useInfiniteScroll",
+      formats: ["es", "cjs"],
+      fileName: (format) => (format === "es" ? "index.js" : "index.cjs"),
     },
     rollupOptions: {
-      // make sure to externalize deps that shouldn't be bundled
-      // into your library
+      // keep peer dependencies out of the bundle
       external: ["react", "react-dom"],
       output: {
         // Provide global variables to use in the UMD build
@@ -33,6 +23,17 @@ export default defineConfig({
           "react-dom": "ReactDOM",
         },
       },
+    },
+  },
+  test: {
+    environment: "jsdom",
+    globals: true,
+    restoreMocks: true,
+    unstubGlobals: true,
+    coverage: {
+      provider: "v8",
+      include: ["lib"],
+      reporter: ["text", "html", "lcov"],
     },
   },
 });

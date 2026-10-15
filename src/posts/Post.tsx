@@ -1,5 +1,5 @@
-import React, { forwardRef } from "react";
-import { Post as PostType } from "./types";
+import { forwardRef } from "react";
+import type { Post as PostType } from "./types";
 
 const Post = forwardRef<HTMLElement, Pick<PostType, "title" | "body">>(
   function Post({ title, body }, ref) {
@@ -13,7 +13,7 @@ const Post = forwardRef<HTMLElement, Pick<PostType, "title" | "body">>(
         <p>{body}</p>
       </article>
     );
-  }
+  },
 );
 
 export default Post;

@@ -1,4 +1,14 @@
 {
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "noEmit": false,
+    "declaration": true,
+    "declarationMap": true,
+    "emitDeclarationOnly": true,
+    "outDir": "dist",
+    "rootDir": "lib",
+    "types": []
+  },
   "include": ["lib"],
-  "references": [{ "path": "./tsconfig.node.json" }]
+  "exclude": ["lib/**/*.test.ts", "lib/**/*.test.tsx"]
 }

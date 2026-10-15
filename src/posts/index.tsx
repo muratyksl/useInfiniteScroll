@@ -1,9 +1,8 @@
-import React from "react";
-
-import useInfiniteScroll, { ReturnType } from "../../lib/main";
+import useInfiniteScroll from "../../lib";
+import type { ReturnType } from "../../lib";
 import Post from "./Post";
 import { getPosts } from "./service";
-import { Post as PostType } from "./types";
+import type { Post as PostType } from "./types";
 import Spinner from "../components/Spinner";
 
 function Posts({

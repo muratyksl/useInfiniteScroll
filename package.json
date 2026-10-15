@@ -1,8 +1,29 @@
 {
-  "name": "useInfiniteScroll",
-  "version": "0.0.0",
+  "name": "useinfinitescroll",
+  "version": "0.1.0",
+  "description": "A tiny, race-safe, SSR-safe React hook for infinite scrolling built on IntersectionObserver. Zero dependencies, fully typed, 100% tested.",
   "type": "module",
   "packageManager": "pnpm@12.11.2",
+  "keywords": [
+    "react",
+    "hook",
+    "hooks",
+    "infinite-scroll",
+    "intersection-observer",
+    "pagination",
+    "scrolling",
+    "typescript"
+  ],
+  "license": "MIT",
+  "author": "Murat Yuksel <yukselm736@gmail.com>",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/muratyksl/useInfiniteScroll.git"
+  },
+  "homepage": "https://github.com/muratyksl/useInfiniteScroll#readme",
+  "bugs": {
+    "url": "https://github.com/muratyksl/useInfiniteScroll/issues"
+  },
   "files": [
     "dist"
   ],
@@ -11,19 +32,29 @@
   "types": "./dist/index.d.ts",
   "exports": {
     ".": {
-      "types": "./dist/index.d.ts",
-      "import": "./dist/index.js",
-      "require": "./dist/index.cjs"
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      },
+      "require": {
+        "types": "./dist/index.d.cts",
+        "default": "./dist/index.cjs"
+      }
     },
     "./package.json": "./package.json"
   },
   "sideEffects": false,
+  "engines": {
+    "node": ">=18"
+  },
   "scripts": {
     "build": "pnpm typecheck && vite build && pnpm build:types",
-    "build:types": "tsc -p tsconfig.lib.json",
+    "build:types": "tsc -p tsconfig.lib.json && node scripts/emit-cts-types.mjs",
+    "check:package": "publint",
     "coverage": "vitest run --coverage",
     "dev": "vite",
     "lint": "eslint .",
+    "prepublishOnly": "pnpm test:run && pnpm build",
     "preview": "vite preview",
     "test": "vitest",
     "test:run": "vitest run",

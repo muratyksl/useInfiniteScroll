@@ -69,14 +69,6 @@ function toError(cause: unknown): Error {
   return cause instanceof Error ? cause : new Error(String(cause));
 }
 
-function isAbortError(cause: unknown): boolean {
-  return (
-    typeof cause === "object" &&
-    cause !== null &&
-    (cause as { name?: unknown }).name === "AbortError"
-  );
-}
-
 /**
  * Infinite scrolling for any paginated API, powered by the
  * `IntersectionObserver` API.
@@ -147,8 +139,9 @@ export function useInfiniteScroll<T>(
     };
 
     const handleError = (cause: unknown): void => {
+      // Requests that were superseded (reset, unmount) never reach this
+      // point: their request id no longer matches.
       if (requestId !== requestIdRef.current) return;
-      if (isAbortError(cause)) return;
 
       failedPageRef.current = targetPage;
       setError(toError(cause));

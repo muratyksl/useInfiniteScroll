@@ -1,0 +1,11 @@
+# vite-plugin-dts@2.3.0 imports "@microsoft/api-extractor/lib/collector/Collector.js",
+# which only exists up to 7.56.0. Newer versions moved the ESM build to lib-esm/
+# and added an exports map that breaks that import.
+overrides:
+  "@microsoft/api-extractor": 7.56.0
+
+# Allow the build scripts of these well-known packages:
+# esbuild installs its native binary, msw copies mockServiceWorker.js into public/.
+allowBuilds:
+  esbuild: true
+  msw: true

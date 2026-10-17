@@ -5,6 +5,15 @@ updates:
     schedule:
       interval: weekly
     open-pull-requests-limit: 5
+    ignore:
+      # Keep @types/node on the Node line we target (.node-version = 24,
+      # CI = 22 + 24, engines >= 18). Types ahead of the oldest supported
+      # runtime let APIs through that do not exist there — and the test
+      # suite cannot catch that for consumers on older Node. Majors are not
+      # banned: revisit when Node 26 is Active LTS (late Oct 2026) and the
+      # CI matrix moves with it.
+      - dependency-name: "@types/node"
+        versions: [">=26"]
 
   - package-ecosystem: github-actions
     directory: /

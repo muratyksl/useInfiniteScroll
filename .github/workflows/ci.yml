@@ -7,7 +7,12 @@ on:
 
 jobs:
   test:
+    name: Node ${{ matrix.node }}
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        node: [22, 24]
     steps:
       - uses: actions/checkout@v4
 
@@ -15,7 +20,7 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version-file: .node-version
+          node-version: ${{ matrix.node }}
           cache: pnpm
 
       - name: Install dependencies
@@ -30,8 +35,17 @@ jobs:
       - name: Test
         run: pnpm test:run
 
-      - name: Build
+      - name: Coverage
+        if: matrix.node == 24
+        run: pnpm coverage
+
+      - name: Build library
         run: pnpm build
 
+      - name: Build demo
+        if: matrix.node == 24
+        run: pnpm build:demo
+
       - name: Check package (publint)
+        if: matrix.node == 24
         run: pnpm check:package

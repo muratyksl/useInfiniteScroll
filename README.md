@@ -1,5 +1,8 @@
 # useInfiniteScroll
 
+[![CI](https://github.com/muratyksl/useInfiniteScroll/actions/workflows/ci.yml/badge.svg)](https://github.com/muratyksl/useInfiniteScroll/actions/workflows/ci.yml)
+[![license](https://img.shields.io/badge/license-MIT-blue.svg)](./LICENSE)
+
 A tiny, **race-safe**, **SSR-safe** React hook for infinite scrolling, built on the
 [IntersectionObserver API](https://developer.mozilla.org/en-US/docs/Web/API/Intersection_Observer_API).
 
@@ -50,11 +53,18 @@ details that usually break:
 - **SSR-safe** — no `window`/`IntersectionObserver` access during render. Without the
   observer (SSR, older browsers, jsdom) the first page still loads and `loadMore()`
   works as a manual fallback.
+- **UI-agnostic** — the hook renders nothing and assumes no markup. Point
+  `setLastElement` at a `<div>`, a table row, an SVG node or any component ref;
+  everything else is up to your design system. The package ships no components
+  and no CSS (the Tailwind demo is just an app).
 - **Prefetch margin** — `rootMargin: "300px"` starts loading before the user hits the
   bottom.
-- **Proven** — 26 tests, 100% statement/branch coverage on the hook. The test double
-  fires real `IntersectionObserver` callbacks, so the scrolling behavior itself is
-  under test.
+- **Query-library friendly** — fetch straight through your `QueryClient` with the
+  [`useinfinitescroll/query`](#tanstack-query-and-other-query-libraries) adapter and
+  keep its caching, deduplication and retries.
+- **Proven** — 34 tests, 100% statement/branch coverage on both entry points. The test
+  double fires real `IntersectionObserver` callbacks, so the scrolling behavior
+  itself is under test.
 
 ## Install
 
@@ -109,6 +119,46 @@ same race-safety and page bookkeeping:
 `reset()` clears the list and loads page 1 again (useful for filters, pull-to-refresh
 or a "restart" action). Any in-flight request is aborted and its response ignored.
 
+### TanStack Query (and other query libraries)
+
+Nothing here conflicts with a data-fetching library — but you don't have to choose:
+the `useinfinitescroll/query` adapter routes every page through your
+`QueryClient`, so TanStack Query provides caching, in-flight deduplication and
+retries while the hook keeps handling the sentinel and page bookkeeping.
+
+```tsx
+import { useQueryClient } from "@tanstack/react-query";
+import { useInfiniteScroll } from "useinfinitescroll";
+import { createQueryFetcher } from "useinfinitescroll/query";
+
+function List() {
+  const queryClient = useQueryClient();
+
+  const { data, hasNextPage, setLastElement } = useInfiniteScroll(
+    createQueryFetcher<Post>(queryClient, {
+      queryKey: (page) => ["posts", page],
+      queryFn: async (page, { signal }) => {
+        const response = await fetch(`/api/posts?_page=${page}&_limit=10`, {
+          signal,
+        });
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        return { data: await response.json(), totalPages: 10 };
+      },
+      staleTime: 60_000,
+    }),
+  );
+  // ... same rendering as above
+}
+```
+
+The adapter is **structural**: it only requires a `fetchQuery` method, so it has no
+runtime or type dependency on `@tanstack/react-query` (a real `QueryClient`
+satisfies it as-is, and so does anything else with the same shape). A page that is
+already fresh in the cache — for example after `reset()` — is served without a
+network call. If you would rather have TanStack Query own the pagination state
+itself, its `useInfiniteQuery` is the right tool; this adapter is for keeping the
+scroll mechanics of this hook while your query client does the fetching.
+
 ## API
 
 ### `useInfiniteScroll(fetcher, options?)`
@@ -145,9 +195,11 @@ type InfiniteScrollFetcher<T> = (
 
 ## Demo
 
-The repo contains a demo app that paginates the public
-[JSONPlaceholder](https://jsonplaceholder.typicode.com/) API, including error, retry,
-end-of-list and reset states:
+A live demo is deployed to GitHub Pages:
+**https://muratyksl.github.io/useInfiniteScroll/**
+
+It paginates the public [JSONPlaceholder](https://jsonplaceholder.typicode.com/) API,
+including error, retry, end-of-list and reset states. Run it locally:
 
 ```sh
 pnpm install
@@ -167,14 +219,30 @@ Requires Node 24+ and pnpm 12 (see `.node-version` / `packageManager`).
 | `pnpm typecheck`     | TypeScript, no emit.                                |
 | `pnpm lint`          | ESLint (flat config, react-hooks rules included).   |
 | `pnpm build`         | Typechecks, bundles `lib/` to `dist/`, emits types. |
+| `pnpm build:demo`    | Builds the demo app to `dist-demo/` (GitHub Pages). |
 | `pnpm check:package` | [publint](https://publint.dev) packaging check.     |
 
 Tests live next to the code they cover:
 
-- `lib/useInfiniteScroll.test.tsx` — hook behavior (mount, paging, races, retries, aborting).
+- `lib/useInfiniteScroll.test.tsx` — hook behavior (mount, paging, races, retries,
+  aborting, UI-agnostic sentinels).
+- `lib/query.test.tsx` — the TanStack Query adapter against a real `QueryClient`
+  (cache population, cache hits on reset, deduplication, signal combining).
 - `src/posts/service.test.ts` — request shape, `totalPages` derivation, errors.
 - `src/posts/posts.test.tsx` — the demo end to end, driven by a controllable
   `IntersectionObserver` double (`test/mock-intersection-observer.ts`).
+
+## CI/CD
+
+- **CI** (`.github/workflows/ci.yml`) — on every push/PR: typecheck, lint, tests and
+  build on Node 22 and 24, plus coverage, demo build and publint on Node 24.
+- **Demo** (`.github/workflows/pages.yml`) — builds and deploys the demo app to
+  GitHub Pages on every push to `master`.
+- **Publish** (`.github/workflows/publish.yml`) — publishing a GitHub release (or
+  manual dispatch) tests, builds and publishes to npm with
+  [provenance](https://docs.npmjs.com/generating-provenance-statements) via
+  trusted publishing.
+- **Dependabot** keeps npm dependencies and actions up to date weekly.
 
 ## License
 

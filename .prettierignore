@@ -1,3 +1,4 @@
 dist
+dist-demo
 coverage
 pnpm-lock.yaml

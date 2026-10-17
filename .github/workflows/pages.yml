@@ -33,7 +33,7 @@ jobs:
       - name: Build demo
         run: pnpm build:demo
 
-      - uses: actions/configure-pages@v5
+      - uses: actions/configure-pages@v6
 
       - uses: actions/upload-pages-artifact@v3
         with:

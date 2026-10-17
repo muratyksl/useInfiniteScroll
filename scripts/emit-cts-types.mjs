@@ -1,21 +1,25 @@
-// TypeScript resolves `dist/index.d.cts` for CommonJS consumers that use
-// `moduleResolution: "node16"/"nodenext"`, so mirror the ESM declarations.
+// TypeScript resolves `*.d.cts` files for CommonJS consumers that use
+// `moduleResolution: "node16"/"nodenext"`, so mirror every emitted `*.d.ts`
+// as `*.d.cts` with corrected sourcemap references.
 // (`tsc` itself only emits one extension per build.)
-import { readFile, writeFile } from "node:fs/promises";
+import { readdir, readFile, writeFile } from "node:fs/promises";
 
-const declarations = "dist/index.d.ts";
-const mapped = `${declarations}.map`;
-const cjsDeclarations = "dist/index.d.cts";
-const cjsMapped = `${cjsDeclarations}.map`;
+const files = (await readdir("dist")).filter((file) => file.endsWith(".d.ts"));
 
-const dts = await readFile(declarations, "utf8");
-await writeFile(
-  cjsDeclarations,
-  dts.replace("index.d.ts.map", "index.d.cts.map"),
-);
+for (const file of files) {
+  const ctsFile = file.replace(/\.d\.ts$/, ".d.cts");
 
-const map = await readFile(mapped, "utf8");
-await writeFile(
-  cjsMapped,
-  map.replace('"file":"index.d.ts"', '"file":"index.d.cts"'),
-);
+  const declarations = await readFile(`dist/${file}`, "utf8");
+  await writeFile(
+    `dist/${ctsFile}`,
+    declarations.replace(`${file}.map`, `${ctsFile}.map`),
+  );
+
+  const map = await readFile(`dist/${file}.map`, "utf8");
+  await writeFile(
+    `dist/${ctsFile}.map`,
+    map.replace(`"file":"${file}"`, `"file":"${ctsFile}"`),
+  );
+
+  console.log(`mirrored dist/${file} -> dist/${ctsFile}`);
+}

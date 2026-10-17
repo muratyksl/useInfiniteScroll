@@ -11,6 +11,7 @@
     "infinite-scroll",
     "intersection-observer",
     "pagination",
+    "tanstack-query",
     "scrolling",
     "typescript"
   ],
@@ -41,6 +42,16 @@
         "default": "./dist/index.cjs"
       }
     },
+    "./query": {
+      "import": {
+        "types": "./dist/query.d.ts",
+        "default": "./dist/query.js"
+      },
+      "require": {
+        "types": "./dist/query.d.cts",
+        "default": "./dist/query.cjs"
+      }
+    },
     "./package.json": "./package.json"
   },
   "sideEffects": false,
@@ -49,6 +60,7 @@
   },
   "scripts": {
     "build": "pnpm typecheck && vite build && pnpm build:types",
+    "build:demo": "vite build --config vite.config.demo.ts",
     "build:types": "tsc -p tsconfig.lib.json && node scripts/emit-cts-types.mjs",
     "check:package": "publint",
     "coverage": "vitest run --coverage",
@@ -67,6 +79,7 @@
   "devDependencies": {
     "@eslint/js": "^9.39.5",
     "@tailwindcss/postcss": "^4.3.3",
+    "@tanstack/react-query": "^5.104.3",
     "@testing-library/dom": "^10.4.2",
     "@testing-library/react": "^16.3.3",
     "@testing-library/user-event": "^14.6.8",

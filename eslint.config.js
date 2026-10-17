@@ -23,5 +23,11 @@ export default tseslint.config(
       "react/prop-types": "off",
     },
   },
+  {
+    files: ["**/*.{js,mjs}"],
+    languageOptions: {
+      globals: { ...globals.node },
+    },
+  },
   prettier,
 );

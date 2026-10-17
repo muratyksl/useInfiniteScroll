@@ -7,10 +7,14 @@ export default defineConfig({
     copyPublicDir: false,
     sourcemap: true,
     lib: {
-      entry: "lib/index.ts",
+      entry: {
+        index: "lib/index.ts",
+        query: "lib/query.ts",
+      },
       name: "useInfiniteScroll",
       formats: ["es", "cjs"],
-      fileName: (format) => (format === "es" ? "index.js" : "index.cjs"),
+      fileName: (format, entryName) =>
+        format === "es" ? `${entryName}.js` : `${entryName}.cjs`,
     },
     rollupOptions: {
       // keep peer dependencies out of the bundle

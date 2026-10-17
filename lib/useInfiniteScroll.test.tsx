@@ -391,6 +391,73 @@ describe("useInfiniteScroll", () => {
     );
   });
 
+  it("is UI agnostic: drives a table layout with a plain ref", async () => {
+    installMockIntersectionObserver();
+    const fetcher = vi.fn<InfiniteScrollFetcher<Item>>(async (page) =>
+      pageData(page, 2),
+    );
+
+    function TableFixture() {
+      const { data, hasNextPage, setLastElement } = useInfiniteScroll(fetcher);
+      return (
+        <table>
+          <tbody>
+            {data.map((item) => (
+              <tr key={item.id}>
+                <td>row {item.id}</td>
+              </tr>
+            ))}
+            {hasNextPage ? (
+              <tr data-testid="sentinel" ref={setLastElement}>
+                <td>loading next page…</td>
+              </tr>
+            ) : null}
+          </tbody>
+        </table>
+      );
+    }
+
+    render(<TableFixture />);
+
+    const sentinel = await screen.findByTestId("sentinel");
+    await waitFor(() =>
+      expect(MockIntersectionObserver.latest?.observedElements).toEqual([
+        sentinel,
+      ]),
+    );
+    expect(screen.getAllByRole("row")).toHaveLength(PAGE_SIZE + 1);
+
+    await act(async () => {
+      MockIntersectionObserver.latest?.trigger();
+    });
+
+    await waitFor(() =>
+      expect(screen.getAllByRole("row")).toHaveLength(2 * PAGE_SIZE),
+    );
+    expect(screen.queryByTestId("sentinel")).toBeNull();
+  });
+
+  it("accepts any Element as the sentinel, including SVG", async () => {
+    installMockIntersectionObserver();
+    const fetcher = vi.fn<InfiniteScrollFetcher<Item>>(async (page) =>
+      pageData(page, 2),
+    );
+
+    function SvgFixture() {
+      const { setLastElement } = useInfiniteScroll(fetcher);
+      return <svg data-testid="sentinel" ref={setLastElement} />;
+    }
+
+    render(<SvgFixture />);
+
+    const sentinel = screen.getByTestId("sentinel");
+    await waitFor(() =>
+      expect(MockIntersectionObserver.latest?.observedElements).toEqual([
+        sentinel,
+      ]),
+    );
+  });
+
   it("wraps non-Error rejections into Error instances", async () => {
     const fetcher = vi.fn<InfiniteScrollFetcher<Item>>(async () => {
       throw "boom";

@@ -51,10 +51,11 @@ export type UseInfiniteScrollResult<T> = {
   /** `false` once all pages are loaded. */
   hasNextPage: boolean;
   /**
-   * Ref callback for the sentinel element. Mount it after the last rendered
-   * item. When it becomes visible, the next page is loaded automatically.
+   * Ref callback for the sentinel element: mount it wherever the next page
+   * should start loading (after the last item, a table row, an SVG element —
+   * any `Element`). The hook renders nothing itself and assumes no markup.
    */
-  setLastElement: (node: HTMLElement | null) => void;
+  setLastElement: (node: Element | null) => void;
   /**
    * Loads the next page manually (useful for a "Load more" button). While a
    * request is in flight it is a no-op. If the previous page failed, it
@@ -107,7 +108,7 @@ export function useInfiniteScroll<T>(
   const failedPageRef = useRef<number | null>(null);
   const requestIdRef = useRef(0);
   const abortRef = useRef<AbortController | null>(null);
-  const lastElementRef = useRef<HTMLElement | null>(null);
+  const lastElementRef = useRef<Element | null>(null);
   const observerRef = useRef<IntersectionObserver | null>(null);
 
   // Keep the latest fetcher without re-triggering requests when the consumer
@@ -194,7 +195,7 @@ export function useInfiniteScroll<T>(
     return runFetch(1);
   }, [runFetch]);
 
-  const setLastElement = useCallback((node: HTMLElement | null) => {
+  const setLastElement = useCallback((node: Element | null) => {
     const observer = observerRef.current;
     const previous = lastElementRef.current;
 
